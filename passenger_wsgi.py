@@ -14,7 +14,7 @@ project = os.path.dirname(nginx_configuration)
 workspace = os.path.dirname(project)
 sys.path.append(workspace)
 
-from . import app
+from tardis import app
 
 def application(environment, response):
   return app.wsgi(environment, response)
