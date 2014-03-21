@@ -17,4 +17,4 @@ sys.path.append(workspace)
 import bottle
 
 def application(environment, response):
-  return bottle.default_app.wsgi(environment, response)
+  return bottle.default_app().wsgi(environment, response)
