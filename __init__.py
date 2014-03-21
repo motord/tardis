@@ -2,6 +2,15 @@
 __author__ = 'peter'
 __version__ = '0.1'
 
+
+from cork import Cork
+from cork.backends import SqlAlchemyBackend
+from patches import SqlAlchemyBackendInitializer
+
+sai = SqlAlchemyBackendInitializer('postgresql+psycopg2://peter:omerta@localhost/knuckle')
+sa = SqlAlchemyBackend('postgresql+psycopg2://peter:omerta@localhost/knuckle')
+aaa = Cork(backend=sa)
+
 from bottle import Bottle
 app = Bottle()
 from controllers import *
