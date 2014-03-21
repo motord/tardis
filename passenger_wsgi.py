@@ -14,7 +14,7 @@ project = os.path.dirname(nginx_configuration)
 workspace = os.path.dirname(project)
 sys.path.append(workspace)
 
-from tardis import app
+import bottle
 
 def application(environment, response):
-  return app.wsgi(environment, response)
+  return bottle.default_app.wsgi(environment, response)
