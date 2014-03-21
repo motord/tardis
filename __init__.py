@@ -4,4 +4,4 @@ __version__ = '0.1'
 
 from bottle import Bottle
 app = Bottle()
-import controllers
+from controllers.vault import *
