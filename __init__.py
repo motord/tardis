@@ -7,9 +7,9 @@ from cork import Cork
 from cork.backends import SqlAlchemyBackend
 from patches import SqlAlchemyBackendInitializer
 
-sai = SqlAlchemyBackendInitializer('postgresql+psycopg2://peter:omerta@localhost/knuckle')
+# sai = SqlAlchemyBackendInitializer('postgresql+psycopg2://peter:omerta@localhost/knuckle')
 sa = SqlAlchemyBackend('postgresql+psycopg2://peter:omerta@localhost/knuckle')
-aaa = Cork(backend=sa)
+spigot = Cork(backend=sa)
 
 from bottle import Bottle
 app = Bottle()
