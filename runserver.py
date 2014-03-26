@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
 __author__ = 'peter'
 
-import os
-from tardis import app
-from bottle import debug, run
+import tornado.httpserver
+import tornado.ioloop
+import tornado.web
+from tornado.options import options
 
-import bottle
-bottle.TEMPLATE_PATH.insert(0,'/home/peter/Projects/tardis/views/')
+from settings import settings
+from urls import url_patterns
 
-debug(True)
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
-    run(app, reloader=True, host='0.0.0.0', port=port)
+class TornadoBoilerplate(tornado.web.Application):
+    def __init__(self):
+        tornado.web.Application.__init__(self, url_patterns, **settings)
+
+
+def main():
+    app = TornadoBoilerplate()
+    http_server = tornado.httpserver.HTTPServer(app)
+    http_server.listen(options.port)
+    tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == "__main__":
+    main()
