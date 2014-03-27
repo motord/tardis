@@ -3,7 +3,9 @@ __author__ = 'peter'
 
 import tornado.web
 import tornado.escape
+from base import BaseHandler
 
-class TenantHandler(tornado.web.RequestHandler):
+
+class TenantHandler(BaseHandler):
     def get(self):
         pass

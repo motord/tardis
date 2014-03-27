@@ -4,10 +4,10 @@ __author__ = 'peter'
 import tornado.web
 import tornado.escape
 import tornado.template
-from handlers.base import BaseHandler
+from base import BaseHandler
 
 import logging
-logger = logging.getLogger('boilerplate.' + __name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class LoginHandler(BaseHandler):
