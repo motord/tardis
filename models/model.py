@@ -50,13 +50,15 @@ Example use::
 
 """
 import base64
-from tornado import gen
 import hashlib
 import logging
 import time
 import uuid
 
-from .. import mapping
+from tornado import gen
+
+from tinman import mapping
+
 
 LOGGER = logging.getLogger(__name__)
 

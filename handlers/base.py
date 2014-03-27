@@ -3,14 +3,16 @@ Base Tinman RequestHandlers
 
 """
 import datetime
-from tornado import gen
 import json
 import logging
+
+from tornado import gen
 from tornado import escape
 from tornado import web
 
-from .. import config
-from .. import session
+from tinman import config
+from tinman import session
+
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,7 +55,7 @@ class BaseHandler(web.RequestHandler):
     JSON = 'application/json'
 
     def __init__(self, application, request, **kwargs):
-        super(RequestHandler, self).__init__(application, request, **kwargs)
+        super(BaseHandler, self).__init__(application, request, **kwargs)
 
     def _method_not_allowed(self):
         self.set_header('Allow', ', '.join(self.ALLOW))
@@ -138,7 +140,7 @@ class BaseHandler(web.RequestHandler):
         assigned to the json_arguments attribute.
 
         """
-        super(RequestHandler, self).prepare()
+        super(BaseHandler, self).prepare()
         if self.request.headers.get('content-type', '').startswith(self.JSON):
             self.request.body = escape.json_decode(self.request.body)
 
@@ -205,7 +207,7 @@ class BaseHandler(web.RequestHandler):
 
 
 
-class SessionRequestHandler(RequestHandler):
+class SessionRequestHandler(BaseHandler):
     """A RequestHandler that adds session support. For configuration details
     see the tinman.session module.
 

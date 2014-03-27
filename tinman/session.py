@@ -2,7 +2,6 @@
 Tinman session classes for the management of session data
 
 """
-from tornado import gen
 import logging
 import os
 from os import path
@@ -10,9 +9,12 @@ import tempfile
 import time
 import uuid
 
-from . import config
-from . import exceptions
-from . import mapping
+from tornado import gen
+
+import exceptions
+import mapping
+import config
+
 
 LOGGER = logging.getLogger(__name__)
 
