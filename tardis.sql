@@ -24,6 +24,29 @@ WITH (
 ALTER TABLE boxes
   OWNER TO tardis;
 
+-- Table: bots
+
+-- DROP TABLE bots;
+
+CREATE TABLE bots
+(
+  id serial NOT NULL,
+  box_id uuid NOT NULL,
+  name character varying(255),
+  code text,
+  created_at timestamp without time zone,
+  updated_at timestamp without time zone,
+  CONSTRAINT bots_pkey PRIMARY KEY (id),
+  CONSTRAINT bots_boxes_fkey FOREIGN KEY (box_id)
+      REFERENCES boxes (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE bots
+  OWNER TO tardis;
+
 -- Table: authorizations
 
 -- DROP TABLE authorizations;
