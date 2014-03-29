@@ -49,7 +49,6 @@ class Application(web.Application):
         self._prepare_translations()
         self._prepare_uimodules()
         self._prepare_version()
-        self.prepare_routes(routes)
         if not routes:
             LOGGER.critical('Did not add any routes, will exit')
             raise exceptions.NoRoutesException()
@@ -90,40 +89,6 @@ class Application(web.Application):
         """
         return self._config.get(config.PATHS, dict())
 
-    def prepare_routes(self, routes):
-        """Prepare the routes by iterating through the list of tuples & calling
-        prepare route on them.
-
-        :param routes: Routes to prepare
-        :type routes: list
-        :rtype: list
-        :raises: ValueError
-
-        """
-        if not isinstance(routes, list):
-            raise ValueError('Routes parameter must be a list of tuples')
-        prepared_routes = list()
-        for parts in routes:
-            route = self._prepare_route(parts)
-            if route:
-                LOGGER.info('Appending handler: %r', route)
-                prepared_routes.append(route)
-        return prepared_routes
-
-    def _import_class(self, class_path):
-        """Try and import the specified namespaced class.
-
-        :param str class_path: The full path to the class (foo.bar.Baz)
-        :rtype: class
-
-        """
-        LOGGER.debug('Importing %s', class_path)
-        try:
-            return utils.import_namespaced_class(class_path)
-        except ImportError as error:
-            LOGGER.critical('Could not import %s: %s', class_path, error)
-            return None
-
     def _import_module(self, module_path):
         """Dynamically import a module returning a handle to it.
 
@@ -160,48 +125,6 @@ class Application(web.Application):
                         self.paths[path].replace(config.BASE_VARIABLE,
                                                  self.paths[config.BASE])
         LOGGER.debug('Prepared paths: %r', self.paths)
-
-    def _prepare_route(self, attrs):
-        """Take a given inbound list for a route and parse it creating the
-        route and importing the class it belongs to.
-
-        :param list attrs: Route attributes
-        :rtype: list
-
-        """
-        if type(attrs) not in (list, tuple):
-            LOGGER.error('Invalid route, must be a list or tuple: %r', attrs)
-            return
-
-        # By default there are not any extra kwargs
-        kwargs = None
-
-        # If there is a regex based route, set it up with a raw string
-        if attrs[0] == 're':
-            route = r'%s' % attrs[1]
-            classpath = attrs[2]
-            if len(attrs) == 4:
-                kwargs = attrs[3]
-        else:
-            route = r'%s' % attrs[0]
-            classpath = attrs[1]
-            if len(attrs) == 3:
-                kwargs = attrs[2]
-
-        LOGGER.debug('Initializing route: %s with %s', route, classpath)
-        try:
-            handler = self._import_class(classpath)
-        except ImportError as error:
-            LOGGER.error('Class import error for %s: %r', classpath, error)
-            return None
-
-        # Setup the prepared route, adding kwargs if there are any
-        prepared_route = [route, handler]
-        if kwargs:
-            prepared_route.append(kwargs)
-
-        # Return the prepared route as a tuple
-        return tuple(prepared_route)
 
     def _prepare_static_path(self):
         LOGGER.info('%s in %r: %s', config.STATIC, self.paths,
@@ -395,9 +318,8 @@ class Attributes(object):
 
 
 def main():
-    app = Application(settings, url_patterns)
+    app = Application(settings, url_patterns, options.port)
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":
