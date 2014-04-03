@@ -57,10 +57,13 @@ CREATE TABLE authorizations
   token character varying(255) NOT NULL,
   scope text NOT NULL,
   origin character varying(255) NOT NULL,
-  user_id integer NOT NULL,
+  avatar_id integer NOT NULL,
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
-  CONSTRAINT authorizations_pkey PRIMARY KEY (id)
+  CONSTRAINT authorizations_pkey PRIMARY KEY (id),
+  CONSTRAINT authorizations_avatars_fkey FOREIGN KEY (avatar_id)
+    REFERENCES avatars (id) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
@@ -88,8 +91,11 @@ CREATE TABLE nodes
   collection character varying(128) NOT NULL,
   data json,
   updated_at timestamp without time zone NOT NULL,
-  user_id integer NOT NULL,
-  CONSTRAINT nodes_pkey PRIMARY KEY (id)
+  avatar_id integer NOT NULL,
+  CONSTRAINT nodes_pkey PRIMARY KEY (id),
+  CONSTRAINT authorizations_avatars_fkey FOREIGN KEY (avatar_id)
+    REFERENCES avatars (id) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
@@ -161,11 +167,11 @@ CREATE INDEX index_tenants_on_email
   USING btree
   (email COLLATE pg_catalog."default");
 
--- Table: users
+-- Table: avatars
 
--- DROP TABLE users;
+-- DROP TABLE avatars;
 
-CREATE TABLE users
+CREATE TABLE avatars
 (
   id serial NOT NULL,
   login character varying(255),
@@ -181,37 +187,37 @@ CREATE TABLE users
   current_login_ip character varying(255),
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
-  CONSTRAINT users_pkey PRIMARY KEY (id)
+  CONSTRAINT avatars_pkey PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE users
+ALTER TABLE avatars
   OWNER TO tardis;
 
--- Index: index_users_on_email
+-- Index: index_avatars_on_email
 
--- DROP INDEX index_users_on_email;
+-- DROP INDEX index_avatars_on_email;
 
-CREATE INDEX index_users_on_email
-  ON users
+CREATE INDEX index_avatars_on_email
+  ON avatars
   USING btree
   (email COLLATE pg_catalog."default");
 
--- Index: index_users_on_last_request_at
+-- Index: index_avatars_on_last_request_at
 
--- DROP INDEX index_users_on_last_request_at;
+-- DROP INDEX index_avatars_on_last_request_at;
 
-CREATE INDEX index_users_on_last_request_at
-  ON users
+CREATE INDEX index_avatars_on_last_request_at
+  ON avatars
   USING btree
   (last_request_at);
 
--- Index: index_users_on_login
+-- Index: index_avatars_on_login
 
--- DROP INDEX index_users_on_login;
+-- DROP INDEX index_avatars_on_login;
 
-CREATE INDEX index_users_on_login
-  ON users
+CREATE INDEX index_avatars_on_login
+  ON avatars
   USING btree
   (login COLLATE pg_catalog."default");

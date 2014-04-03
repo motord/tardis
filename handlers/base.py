@@ -205,6 +205,9 @@ class BaseHandler(web.RequestHandler):
         LOGGER.debug("Found '%s': %s in JSON arguments" % (name, arg))
         return arg
 
+    @property
+    def db(self):
+        return self.application.db
 
 
 class SessionRequestHandler(BaseHandler):

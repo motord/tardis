@@ -54,6 +54,7 @@ import hashlib
 import logging
 import time
 import uuid
+import momoko
 
 from tornado import gen
 
@@ -195,6 +196,78 @@ class AsyncRedisModel(StorageModel):
 
         # The parent will attempt to fetch the value if item_id is set
         super(AsyncRedisModel, self).__init__(item_id, **kwargs)
+
+    @property
+    def _key(self):
+        """Return a storage key for Redis that consists of the class name of
+        the model and its id joined by :.
+
+        :rtype: str
+
+        """
+        return '%s:%s' % (self.__class__.__name__, self.id)
+
+    @gen.coroutine
+    def delete(self):
+        """Delete the item from storage
+
+        :rtype: bool
+
+        """
+        result = gen.Task(self._redis_client.delete, self._key)
+        raise gen.Return(bool(result))
+
+    @gen.coroutine
+    def fetch(self):
+        """Fetch the data for the model from Redis and assign the values.
+
+        :rtype: bool
+
+        """
+        raw = yield gen.Task(self._redis_client.get, self._key)
+        if raw:
+            self.loads(base64.b64decode(raw))
+            raise gen.Return(True)
+        raise gen.Return(False)
+
+    @gen.coroutine
+    def save(self):
+        """Store the model in Redis.
+
+        :rtype: bool
+
+        """
+        pipeline = self._redis_client.pipeline()
+        pipeline.set(self._key, base64.b64encode(self.dumps()))
+        if self._ttl:
+            pipeline.expire(self._key, self._ttl)
+        result = yield gen.Task(pipeline.execute)
+        self._dirty, self._saved = not all(result), all(result)
+        raise gen.Return(all(result))
+
+
+class AsyncMomokoModel(StorageModel):
+    """A model base class that uses PostgreSQL for the storage backend. Uses the
+    asynchronous momoko client.
+
+    :param str item_id: The id for the data item
+    :param tornadoredis.Client: The already created tornadoredis client
+
+    """
+    _redis_client = None
+    _saved = False
+    _ttl = None
+
+    def __init__(self, item_id=None, *args, **kwargs):
+        if 'msgpack' not in globals():
+            import msgpack
+        self._serializer = msgpack
+        if 'redis_client' not in kwargs:
+            raise ValueError('redis_client must be passed in')
+        self._redis_client = kwargs['redis_client']
+
+        # The parent will attempt to fetch the value if item_id is set
+        super(AsyncMomokoModel, self).__init__(item_id, **kwargs)
 
     @property
     def _key(self):
