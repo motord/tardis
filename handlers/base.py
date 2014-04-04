@@ -205,9 +205,27 @@ class BaseHandler(web.RequestHandler):
         LOGGER.debug("Found '%s': %s in JSON arguments" % (name, arg))
         return arg
 
+    def get_current_tenant(self):
+        return self.get_secure_cookie("tenantname")
+
     @property
     def db(self):
         return self.application.db
+
+    @property
+    def current_tenant(self):
+        """The authenticated tenant for this request.
+
+        This is a cached version of `get_current_tenant`, which you can
+        override to set the current based on, e.g., a cookie. If that
+        method is not overridden, this method always returns None.
+
+        We lazy-load the current tenant the first time this method is called
+        and cache the result after that.
+        """
+        if not hasattr(self, "_current_tenant"):
+            self._current_tenant = self.get_current_tenant()
+        return self._current_tenant
 
 
 class SessionRequestHandler(BaseHandler):

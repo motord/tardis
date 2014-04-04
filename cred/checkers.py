@@ -7,7 +7,8 @@ import psycopg2
 
 
 class TenantCredentailsChecker(object):
-    def __int__(self, db):
+    def __init__(self, db):
+        super(TenantCredentailsChecker, self).__init__()
         self.db = db
         self.query="SELECT tenantname, email, crypted_password, password_salt FROM tenants WHERE email = '{0}'"
 
@@ -24,7 +25,7 @@ class TenantCredentailsChecker(object):
 
 
 class AvatarCredentailsChecker(object):
-    def __int__(self):
+    def __init__(self):
         self.query="SELECT id, email, password_salt, crypted_password FROM avatars WHERE email = '{0}'"
 
     @gen.coroutine

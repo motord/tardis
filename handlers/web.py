@@ -9,14 +9,15 @@ from base import BaseHandler
 import uuid
 import hashlib
 from cred import TenantEmailPassword, TenantCredentailsChecker
+from decorators import tenant_authenticated
 
 import logging
 LOGGER = logging.getLogger(__name__)
 
 
 class LoginHandler(BaseHandler):
-    def __init__(self):
-        super(LoginHandler, self).__init__()
+    def __init__(self, application, request, **kwargs):
+        super(LoginHandler, self).__init__(application, request, **kwargs)
         self.checker = TenantCredentailsChecker(self.db)
 
     def get(self):
@@ -25,12 +26,11 @@ class LoginHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.engine
     def post(self):
-        # if user["hash"] == hashlib.sha512(password + user["salt"]).hexdigest():
         credentials= TenantEmailPassword(self.get_argument("email"), self.get_argument("password"))
         tenantname=self.checker.requestTenantName(credentials)
         if tenantname:
-            self.render("index.html")
-        self.finish()
+            self.set_secure_cookie("tenantname", tenantname)
+            self.redirect('/')
 
 
 class RegistrationHandler(BaseHandler):
@@ -43,11 +43,10 @@ class RegistrationHandler(BaseHandler):
         salt = uuid.uuid4().hex
         # hash = hashlib.sha512(password + salt).hexdigest()
         self.render("login.html")
-        self.finish()
 
 class DashboardHandler(BaseHandler):
     @tornado.web.asynchronous
     @tornado.gen.engine
+    @tenant_authenticated
     def get(self):
-        self.render("index.html")
-        self.finish()
+        self.render("index.html", tenant=self.current_tenant)
