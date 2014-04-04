@@ -11,7 +11,7 @@ class TenantEmailPassword:
         self.password = password
 
     def checkPassword(self, password, salt):
-        return hashlib.sha512(password + self.salt).hexdigest() == self.password
+        return hashlib.sha512(password + salt).hexdigest() == self.password
 
 
 class AvatarEmailPassword:
