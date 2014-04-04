@@ -27,7 +27,7 @@ class LoginHandler(BaseHandler):
     @tornado.gen.engine
     def post(self):
         credentials= TenantEmailPassword(self.get_argument("email"), self.get_argument("password"))
-        tenantname=self.checker.requestTenantName(credentials)
+        tenantname=yield self.checker.requestTenantName(credentials)
         if tenantname:
             self.set_secure_cookie("tenantname", tenantname)
             self.redirect('/')
