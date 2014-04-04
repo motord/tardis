@@ -23,11 +23,10 @@ class LoginHandler(BaseHandler):
     def get(self):
         self.render("login.html")
 
-    @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def post(self):
         credentials= TenantEmailPassword(self.get_argument("email"), self.get_argument("password"))
-        tenantname=yield self.checker.requestTenantName(credentials)
+        tenantname=yield tornado.gen.Task(self.checker.requestTenantName, credentials)
         if tenantname:
             self.set_secure_cookie("tenantname", tenantname)
             self.redirect('/')
@@ -49,4 +48,4 @@ class DashboardHandler(BaseHandler):
     @tornado.gen.engine
     @tenant_authenticated
     def get(self):
-        self.render("index.html", tenant=self.current_tenant)
+        self.render("index.html", tenantname=self.current_tenant)

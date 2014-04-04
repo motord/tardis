@@ -41,8 +41,9 @@ settings = {}
 settings['debug'] = DEPLOYMENT != DeploymentType.PRODUCTION or options.debug
 settings['static_path'] = MEDIA_ROOT
 settings['cookie_secret'] = "your-cookie-secret"
-# settings['xsrf_cookies'] = True
+settings['xsrf_cookies'] = True
 settings['template_loader'] = tornado.template.Loader(TEMPLATE_ROOT)
+settings['tenant_login_url'] = "/login"
 
 SYSLOG_TAG = "boilerplate"
 SYSLOG_FACILITY = logging.handlers.SysLogHandler.LOG_LOCAL2

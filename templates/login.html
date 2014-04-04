@@ -28,6 +28,7 @@
                     </div>
                     <div class="panel-body">
                         <form role="form" method="post" action="/login">
+                            {% raw xsrf_form_html() %}
                             <fieldset>
                                 <div class="form-group">
                                     <input class="form-control" placeholder="E-mail" name="email" type="email" autofocus>

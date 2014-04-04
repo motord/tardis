@@ -24,9 +24,9 @@ def tenant_authenticated(method):
     """
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
-        if not self.current_user:
+        if not self.current_tenant:
             if self.request.method in ("GET", "HEAD"):
-                url = self.get_login_url()
+                url = self.get_tenant_login_url()
                 if "?" not in url:
                     if urlparse.urlsplit(url).scheme:
                         # if login url is absolute, make next absolute too

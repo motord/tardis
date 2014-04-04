@@ -208,6 +208,14 @@ class BaseHandler(web.RequestHandler):
     def get_current_tenant(self):
         return self.get_secure_cookie("tenantname")
 
+    def get_tenant_login_url(self):
+        """Override to customize the tenant login URL based on the request.
+
+        By default, we use the ``tenant_login_url`` application setting.
+        """
+        self.require_setting("tenant_login_url", "@decorators.tenant_authenticated")
+        return self.application.settings["tenant_login_url"]
+
     @property
     def db(self):
         return self.application.db
