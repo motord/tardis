@@ -5,7 +5,7 @@ import tornado.web
 import tornado.escape
 import tornado.template
 import tornado.gen
-from base import BaseHandler
+from base import TenantRequestHandler
 import uuid
 import hashlib
 from cred import TenantEmailPassword, TenantCredentailsChecker
@@ -15,10 +15,10 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-class LoginHandler(BaseHandler):
+class LoginHandler(TenantRequestHandler):
     def __init__(self, application, request, **kwargs):
         super(LoginHandler, self).__init__(application, request, **kwargs)
-        self.checker = TenantCredentailsChecker(self.db)
+        self.checker = TenantCredentailsChecker()
 
     def get(self):
         self.render("login.html")
@@ -32,7 +32,7 @@ class LoginHandler(BaseHandler):
             self.redirect('/')
 
 
-class RegistrationHandler(BaseHandler):
+class RegistrationHandler(TenantRequestHandler):
     def get(self):
         self.render("register.html")
 
@@ -43,7 +43,7 @@ class RegistrationHandler(BaseHandler):
         # hash = hashlib.sha512(password + salt).hexdigest()
         self.render("login.html")
 
-class DashboardHandler(BaseHandler):
+class DashboardHandler(TenantRequestHandler):
     @tornado.web.asynchronous
     @tornado.gen.engine
     @tenant_authenticated

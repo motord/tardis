@@ -10,6 +10,8 @@ CREATE TABLE boxes
   start_url character varying(255),
   icon_url character varying(255),
   website_url character varying(255),
+  api_key uuid NOT NULL,
+  master_key uuid NOT NULL,
   tenantname character varying(128) NOT NULL,
   created_at timestamp without time zone,
   updated_at timestamp without time zone,

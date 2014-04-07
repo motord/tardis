@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 __author__ = 'peter'
 
-import momoko
+from model import AsyncMomokoModel
 
 
-class Box(object):
+class Box(AsyncMomokoModel):
     pass

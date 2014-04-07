@@ -17,10 +17,6 @@ class Application(tornado.web.Application):
 
 def main():
     app = Application()
-    app.db = momoko.Pool(
-        dsn='dbname=tardis user=tardis password=pewjsu74hr9j3wvvo8yo host=localhost port=5432',
-        size=1
-    )
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
