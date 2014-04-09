@@ -35,7 +35,7 @@ CREATE TABLE bots
   id serial NOT NULL,
   box_id uuid NOT NULL,
   name character varying(255),
-  code text,
+  leverage character varying(255),
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
   CONSTRAINT bots_pkey PRIMARY KEY (id),

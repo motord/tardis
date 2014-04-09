@@ -8,7 +8,16 @@ from tornado.options import options
 import momoko
 
 from settings import settings
-from urls import url_patterns
+from handlers import BoxesHandler, TenantHandler, LoginHandler, DashboardHandler, BotsHandler, NodesHandler
+
+url_patterns = [
+    (r"/", DashboardHandler),
+    (r"/login", LoginHandler),
+    (r"/boxes", BoxesHandler),
+    (r"/bots", BotsHandler),
+    (r"/classes/([a-z]+)", NodesHandler),
+    (r"/classes/([a-z]+)/([0-9]+)", NodesHandler),
+]
 
 class Application(tornado.web.Application):
     def __init__(self):
