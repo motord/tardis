@@ -14,7 +14,7 @@ class TenantCredentailsChecker(object):
 
     @gen.coroutine
     def requestTenant(self, credentials):
-        tenant=yield gen.Task(Tenant.select().where(Tenant.email == credentials.email))
+        tenant=yield gen.Task(Tenant.select().where(Tenant.email == credentials.email).get)
         # try:
         #     cursor = yield momoko.Op(db.execute, self.query.format(credentials.email))
         # except (psycopg2.Warning, psycopg2.Error) as error:
@@ -34,7 +34,7 @@ class AvatarCredentailsChecker(object):
 
     @gen.coroutine
     def requestAvatar(self, credentials):
-        avatar=yield gen.Task(Avatar.select().where((Avatar.email == credentials.email) & (Avatar.box.id==credentials.box_id)))
+        avatar=yield gen.Task(Avatar.select().where((Avatar.email == credentials.email) & (Avatar.box.id==credentials.box_id)).get)
         # try:
         #     cursor = yield momoko.Op(db.execute, self.query.format(credentials.email, credentials.box_id))
         # except (psycopg2.Warning, psycopg2.Error) as error:
@@ -55,7 +55,7 @@ class BoxCredentialsChecker(object):
 
     @gen.coroutine
     def requestBox(self, credentials):
-        box=yield gen.Task(Box.select().where(Box.id==credentials.id))
+        box=yield gen.Task(Box.select().where(Box.id==credentials.id).get)
         # try:
         #     cursor = yield momoko.Op(db.execute, self.query.format(credentials.client_id))
         # except (psycopg2.Warning, psycopg2.Error) as error:
