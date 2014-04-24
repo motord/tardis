@@ -29,7 +29,7 @@ class LoginHandler(TenantRequestHandler):
         credentials= TenantEmailPassword(self.get_argument("email"), self.get_argument("password"))
         tenant=yield tornado.gen.Task(self.checker.requestTenant, credentials)
         if tenant:
-            self.set_secure_cookie("tenantname", tenant.name)
+            self.set_secure_cookie("tenantname", tenant.tenantname)
             self.redirect('/')
 
 
