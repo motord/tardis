@@ -173,7 +173,7 @@ class Database(mopee.PostgresqlAsyncDatabase):
     def _connect(self, database, **kwargs):
         return backends.db
 
-database=mopee.PostgresqlAsyncDatabase(backends.db)
+database=Database(None)
 database.connect()
 
 class AsyncModel(mopee.AsyncModel):
