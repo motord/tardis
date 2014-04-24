@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'peter'
 
-from models import Node
-from base import AvatarRequestHandler
+from handlers.avatar import AvatarRequestHandler
 
 
 class NodesHandler(AvatarRequestHandler):

@@ -8,15 +8,15 @@ from tornado.options import options
 import momoko
 
 from settings import settings
-from handlers import BoxesHandler, TenantHandler, LoginHandler, DashboardHandler, BotsHandler, NodesHandler
+from api import AvatarHandler, BoxesHandler, BotsHandler, NodesHandler, TokenHandler
 
 url_patterns = [
-    (r"/", DashboardHandler),
-    (r"/login", LoginHandler),
+    (r"/avatars", AvatarHandler),
     (r"/boxes", BoxesHandler),
     (r"/bots", BotsHandler),
     (r"/classes/([a-z]+)", NodesHandler),
     (r"/classes/([a-z]+)/([0-9]+)", NodesHandler),
+    (r"/oauth2/token", TokenHandler),
 ]
 
 

@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'peter'
 
-import tornado.web
-import tornado.escape
-from base import TenantRequestHandler
+from handlers.tenant import TenantRequestHandler
 
 class BoxesHandler(TenantRequestHandler):
     def get(self):

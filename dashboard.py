@@ -8,7 +8,7 @@ from tornado.options import options
 import momoko
 
 from settings import settings
-from handlers import BoxesHandler, TenantHandler, LoginHandler, DashboardHandler, BotsHandler, NodesHandler
+from dashboard import BoxesHandler, LoginHandler, DashboardHandler, BotsHandler, NodesHandler
 
 url_patterns = [
     (r"/", DashboardHandler),

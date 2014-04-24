@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 __author__ = 'peter'
 
-from base import AvatarRequestHandler
-from models import Bot
+from handlers.avatar import AvatarRequestHandler
+
 
 class BotsHandler(AvatarRequestHandler):
     def get(self):

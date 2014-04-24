@@ -54,7 +54,8 @@ import hashlib
 import logging
 import time
 import uuid
-import momoko
+import backends
+import mopee
 
 from tornado import gen
 
@@ -166,6 +167,18 @@ class StorageModel(Model):
 
         """
         return self._new
+
+
+class Database(mopee.PostgresqlAsyncDatabase):
+    def _connect(self, database, **kwargs):
+        return backends.db
+
+database=Database()
+database.connect()
+
+class AsyncModel(mopee.AsyncModel):
+    class Meta:
+        database=database
 
 
 class AsyncRedisModel(StorageModel):

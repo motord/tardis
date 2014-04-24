@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 __author__ = 'peter'
 
+import uuid
+import logging
+
 import tornado.web
 import tornado.escape
 import tornado.template
 import tornado.gen
-from base import TenantRequestHandler
-import uuid
-import hashlib
+
+from handlers.tenant import TenantRequestHandler
 from cred import TenantEmailPassword, TenantCredentailsChecker
 from decorators import tenant_authenticated
 
-import logging
 LOGGER = logging.getLogger(__name__)
 
 
@@ -26,9 +27,9 @@ class LoginHandler(TenantRequestHandler):
     @tornado.gen.coroutine
     def post(self):
         credentials= TenantEmailPassword(self.get_argument("email"), self.get_argument("password"))
-        tenantname=yield tornado.gen.Task(self.checker.requestTenantName, credentials)
-        if tenantname:
-            self.set_secure_cookie("tenantname", tenantname)
+        tenant=yield tornado.gen.Task(self.checker.requestTenant, credentials)
+        if tenant:
+            self.set_secure_cookie("tenantname", tenant.name)
             self.redirect('/')
 
 

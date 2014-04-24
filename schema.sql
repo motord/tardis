@@ -35,7 +35,7 @@ CREATE TABLE bots
   id serial NOT NULL,
   box_id uuid NOT NULL,
   name character varying(255),
-  leverage character varying(255),
+  leverage character varying(255) CHECK (bot_functional(leverage)),
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
   CONSTRAINT bots_pkey PRIMARY KEY (id),
@@ -56,7 +56,9 @@ ALTER TABLE bots
 CREATE TABLE authorizations
 (
   id serial NOT NULL,
-  token character varying(255) NOT NULL,
+  access_token character varying(255) UNIQUE NOT NULL,
+  refresh_token character varying(255) UNIQUE NOT NULL,
+  expires_at timestamp without time zone,
   scope text NOT NULL,
   origin character varying(255) NOT NULL,
   avatar_id integer NOT NULL,
@@ -73,14 +75,23 @@ WITH (
 ALTER TABLE authorizations
   OWNER TO tardis;
 
--- Index: index_authorizations_on_token
+-- Index: index_authorizations_on_access_token
 
--- DROP INDEX index_authorizations_on_token;
+-- DROP INDEX index_authorizations_on_access_token;
 
-CREATE INDEX index_authorizations_on_token
+CREATE INDEX index_authorizations_on_access_token
   ON authorizations
   USING btree
-  (token COLLATE pg_catalog."default");
+  (access_token COLLATE pg_catalog."default");
+
+-- Index: index_authorizations_on_refresh_token
+
+-- DROP INDEX index_authorizations_on_refresh_token;
+
+CREATE INDEX index_authorizations_on_refresh_token
+  ON authorizations
+  USING btree
+  (refresh_token COLLATE pg_catalog."default");
 
 -- Table: nodes
 
@@ -93,9 +104,12 @@ CREATE TABLE nodes
   collection character varying(128) NOT NULL,
   data json,
   updated_at timestamp without time zone NOT NULL,
-  avatar_id integer NOT NULL,
+  avatar_id integer,
   CONSTRAINT nodes_pkey PRIMARY KEY (id),
-  CONSTRAINT authorizations_avatars_fkey FOREIGN KEY (avatar_id)
+  CONSTRAINT nodes_boxes_fkey FOREIGN KEY (box_id)
+    REFERENCES boxes (id) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT nodes_avatars_fkey FOREIGN KEY (avatar_id)
     REFERENCES avatars (id) MATCH SIMPLE
     ON UPDATE NO ACTION ON DELETE NO ACTION
 )
@@ -176,6 +190,7 @@ CREATE INDEX index_tenants_on_email
 CREATE TABLE avatars
 (
   id serial NOT NULL,
+  box_id uuid NOT NULL,
   login character varying(255),
   email character varying(128),
   "desc" character varying(128),
@@ -189,6 +204,9 @@ CREATE TABLE avatars
   current_login_ip character varying(255),
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
+  CONSTRAINT avatars_boxes_fkey FOREIGN KEY (box_id)
+    REFERENCES boxes (id) MATCH SIMPLE
+    ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT avatars_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -196,6 +214,15 @@ WITH (
 );
 ALTER TABLE avatars
   OWNER TO tardis;
+
+-- Index: index_avatars_on_box_id
+
+-- DROP INDEX index_avatars_on_box_id;
+
+CREATE INDEX index_avatars_on_box_id
+  ON avatars
+  USING btree
+  (box_id COLLATE pg_catalog."default");
 
 -- Index: index_avatars_on_email
 
