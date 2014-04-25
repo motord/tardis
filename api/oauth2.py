@@ -67,6 +67,8 @@ class TardisRequestValidator(RequestValidator):
     def validate_user(self, username, password, client, request, *args, **kwargs):
         credentials=AvatarEmailPasswordBoxId(username, password, client.box_id)
         request.avatar=AvatarCredentailsChecker.requestAvatar(credentials)
+        request.client=request.avatar.box.id if request.avatar else None
+        request.client_id=request.client.box_id if request.client else None
         return True if request.avatar else False
 
 validator = TardisRequestValidator()
