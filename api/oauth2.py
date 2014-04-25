@@ -63,6 +63,7 @@ class TardisRequestValidator(RequestValidator):
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         return True
 
+    @gen.coroutine
     def validate_user(self, username, password, client, request, *args, **kwargs):
         credentials=AvatarEmailPasswordBoxId(username, password, client.box_id)
         request.avatar=AvatarCredentailsChecker.requestAvatar(credentials)
