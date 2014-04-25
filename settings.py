@@ -12,7 +12,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 
 define("port", default=8888, help="run on the given port", type=int)
 define("config", default=None, help="tornado config file")
-define("debug", default=True, help="debug mode")
+define("debug", default=False, help="debug mode")
 tornado.options.parse_command_line()
 
 MEDIA_ROOT = path(ROOT, 'media')
@@ -38,7 +38,8 @@ else:
     DEPLOYMENT = DeploymentType.SOLO
 
 settings = {}
-settings['debug'] = DEPLOYMENT != DeploymentType.PRODUCTION or options.debug
+# settings['debug'] = DEPLOYMENT != DeploymentType.PRODUCTION or options.debug
+settings['debug'] = True
 settings['static_path'] = MEDIA_ROOT
 settings['cookie_secret'] = "your-cookie-secret"
 settings['xsrf_cookies'] = True
