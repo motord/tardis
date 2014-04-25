@@ -76,13 +76,13 @@ clientCredentialsProvider=BackendApplicationServer(validator)
 class TokenHandler(AvatarRequestHandler):
     @gen.coroutine
     def post(self):
-        if self.grant_type=='password':
+        if self.get_argument('grant_type', default=None)=='password':
             headers, body, status=resourceOwnerPasswordCredentialsProvider.create_token_response(self.request.uri,
                                                                                   http_method=self.request.method,
                                                                                   body=self.request.body,
                                                                                   headers=self.request.headers,
                                                                                   credentials=BoxIdKey(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
-        if self.grant_type=='client_credentials':
+        if self.get_argument('grant_type', default=None)=='client_credentials':
             headers, body, status=clientCredentialsProvider.create_token_response(self.request.uri,
                                                                    http_method=self.request.method,
                                                                    body=self.request.body,
