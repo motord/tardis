@@ -10,7 +10,7 @@ import datetime
 from tornado import web
 from tornado import gen
 from models import Box, Authorization
-from cred import AvatarCredentailsChecker, BoxCredentialsChecker, BoxIdKey, AvatarEmailPasswordBoxId
+from cred import AvatarCredentailsChecker, BoxCredentialsChecker, BoxClientIdClientSecret, AvatarEmailPasswordBoxId
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,6 @@ class TardisRequestValidator(RequestValidator):
     def authenticate_client(self, request, *args, **kwargs):
         checker = BoxCredentialsChecker()
         request.client=checker.requestBox(request.extra_credentials)
-        request.client.client_id=request.client.box_id if request.client else None
         return gen.Return(True) if request.client else gen.Return(False)
 
     def get_default_scopes(self, client_id, request, *args, **kwargs):
@@ -82,13 +81,13 @@ class TokenHandler(AvatarRequestHandler):
                                                                                   http_method=self.request.method,
                                                                                   body=self.request.body,
                                                                                   headers=self.request.headers,
-                                                                                  credentials=BoxIdKey(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
+                                                                                  credentials=BoxClientIdClientSecret(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
         if self.get_argument('grant_type', default=None)=='client_credentials':
             headers, body, status=clientCredentialsProvider.create_token_response(self.request.uri,
                                                                    http_method=self.request.method,
                                                                    body=self.request.body,
                                                                    headers=self.request.headers,
-                                                                   credentials=BoxIdKey(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
+                                                                   credentials=BoxClientIdClientSecret(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
         self.set_status(status)
         self.write(body)
         for k, v in headers.items():

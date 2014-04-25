@@ -55,7 +55,7 @@ class BoxCredentialsChecker(object):
 
     @gen.coroutine
     def requestBox(self, credentials):
-        box=yield gen.Task(Box.select().where(Box.id==credentials.id).get)
+        box=yield gen.Task(Box.select().where(Box.client_id==credentials.client_id).get)
         # try:
         #     cursor = yield momoko.Op(db.execute, self.query.format(credentials.client_id))
         # except (psycopg2.Warning, psycopg2.Error) as error:

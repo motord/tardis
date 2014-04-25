@@ -9,7 +9,7 @@ from tenant import Tenant
 
 
 class Box(AsyncModel):
-    id= mopee.UUIDField(primary_key=True)
+    client_id= mopee.UUIDField(primary_key=True, db_column='id')
     name=mopee.CharField()
     desc=mopee.TextField()
     start_url= mopee.CharField()

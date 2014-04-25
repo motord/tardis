@@ -25,14 +25,14 @@ class AvatarEmailPasswordBoxId:
         return hashlib.sha512(self.password + salt).hexdigest() == password
 
 
-class BoxIdKey:
+class BoxClientIdClientSecret:
 
-    def __init__(self, id, api_key):
-        self.id = id
-        self.key = api_key
+    def __init__(self, client_id, client_secret):
+        self.client_id = client_id
+        self.client_secret = client_secret
 
     def checkApiKey(self, api_key):
-        return self.key == api_key
+        return self.client_secret == api_key
 
     def checkMasterKey(self, master_key):
-        return self.key  == master_key
+        return self.client_secret  == master_key
