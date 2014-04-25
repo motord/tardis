@@ -19,7 +19,7 @@ class TardisRequestValidator(RequestValidator):
     def authenticate_client(self, request, *args, **kwargs):
         checker = BoxCredentialsChecker()
         request.client=checker.requestBox(request.extra_credentials)
-        request.client_id=request.client.box_id
+        request.client_id=request.client.box_id if request.client else None
         return True if request.client else False
 
     def get_default_scopes(self, client_id, request, *args, **kwargs):
