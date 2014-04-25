@@ -19,7 +19,7 @@ url_patterns = [
     (r"/oauth2/token", TokenHandler),
 ]
 
-
+settings['xsrf_cookies'] = False
 class Application(tornado.web.Application):
     def __init__(self):
         tornado.web.Application.__init__(self, url_patterns, **settings)
