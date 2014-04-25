@@ -18,5 +18,12 @@ class AvatarRequestHandler(BaseHandler):
         """
         return self._current_avatar
 
+    @property
+    def grant_type(self):
+        return self._grant_type
+
     def prepare(self):
         super(AvatarRequestHandler, self).prepare()
+        self._grant_type=self.request.headers.get('grant_type', default=None)
+        self._grant_type=self._grant_type if self._grant_type else self.get_argument('grant_type', default=None)
+
