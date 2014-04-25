@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 
 class TardisRequestValidator(RequestValidator):
+    @gen.coroutine
     def authenticate_client(self, request, *args, **kwargs):
         checker = BoxCredentialsChecker()
         request.client=checker.requestBox(request.extra_credentials)
