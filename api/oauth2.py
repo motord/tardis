@@ -16,14 +16,13 @@ log = logging.getLogger(__name__)
 
 
 class TardisRequestValidator(RequestValidator):
-    @gen.coroutine
     def authenticate_client(self, request, *args, **kwargs):
         checker = BoxCredentialsChecker()
-        request.client=yield gen.Task(checker.requestBox, request.extra_credentials)
+        request.client=checker.requestBox(request.extra_credentials)
         log.debug(request.client)
         if request.client:
-            raise gen.Return(True)
-        raise gen.Return(False)
+            return True
+        return False
 
     def get_default_scopes(self, client_id, request, *args, **kwargs):
         return None
@@ -34,12 +33,11 @@ class TardisRequestValidator(RequestValidator):
     def is_within_original_scope(self, request_scopes, refresh_token, request, *args, **kwargs):
         return True
 
-    @gen.coroutine
     def save_bearer_token(self, token, request, *args, **kwargs):
         authorization=Authorization(access_token=token['access_token'], refresh_token=token['refresh_token'],
                                     expires_at=token['expires_at'], avatar=request.avatar,
                                     created_at=datetime.datetime.now(), updated_at=datetime.datetime.now())
-        yield gen.Task(authorization.save)
+        authorization.save()
 
     @gen.coroutine
     def validate_bearer_token(self, token, scopes, request):
@@ -66,13 +64,13 @@ class TardisRequestValidator(RequestValidator):
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         return True
 
-    @gen.coroutine
     def validate_user(self, username, password, client, request, *args, **kwargs):
         credentials=AvatarEmailPasswordBoxId(username, password, client.box_id)
-        request.avatar=yield gen.Task(AvatarCredentailsChecker.requestAvatar, credentials)
+        checker=AvatarCredentailsChecker()
+        request.avatar=checker.requestAvatar(credentials)
         if request.avatar:
-            raise gen.Return(True)
-        raise gen.Return(False)
+            return True
+        return False
 
 validator = TardisRequestValidator()
 resourceOwnerPasswordCredentialsProvider=LegacyApplicationServer(validator)
