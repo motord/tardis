@@ -39,12 +39,12 @@ class TardisRequestValidator(RequestValidator):
 
     def save_bearer_token(self, token, request, *args, **kwargs):
         authorization=Authorization(access_token=token['access_token'], refresh_token=token['refresh_token'],
-                                    expires_at=datetime.now() + timedelta(seconds=100), avatar=request.avatar,
-                                    created_at=datetime.datetime.now(), updated_at=datetime.datetime.now())
+                                    expires_at=datetime.utcnow() + timedelta(seconds=100), avatar=request.avatar,
+                                    created_at=datetime.utcnow(), updated_at=datetime.utcnow())
         self.authorization.save()
 
     def validate_bearer_token(self, token, scopes, request):
-        if datetime.datetime.now() > self.authorization.expires_at:
+        if datetime.utcnow() > self.authorization.expires_at:
             return False
         request.access_token = self.authorization.access_token
         request.user = self.authorization.avatar
