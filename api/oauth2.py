@@ -41,7 +41,7 @@ class TardisRequestValidator(RequestValidator):
         authorization=Authorization(access_token=token['access_token'], refresh_token=token['refresh_token'],
                                     expires_at=datetime.utcnow() + timedelta(seconds=100), avatar=request.avatar,
                                     created_at=datetime.utcnow(), updated_at=datetime.utcnow())
-        self.authorization.save()
+        authorization.save()
 
     def validate_bearer_token(self, token, scopes, request):
         if datetime.utcnow() > self.authorization.expires_at:
