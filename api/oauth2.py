@@ -16,10 +16,11 @@ log = logging.getLogger(__name__)
 
 
 class TardisRequestValidator(RequestValidator):
-    def __init__(self, client, authorization):
+    def __init__(self, client, authorization, avatar):
         super(TardisRequestValidator, self).__init__()
         self.client=client
         self.authorization=authorization
+        self.avatar=avatar
 
     def authenticate_client(self, request, *args, **kwargs):
         request.client=self.client
@@ -64,9 +65,7 @@ class TardisRequestValidator(RequestValidator):
         return True
 
     def validate_user(self, username, password, client, request, *args, **kwargs):
-        credentials=AvatarEmailPasswordBoxId(username, password, client.box_id)
-        checker=AvatarCredentailsChecker()
-        request.avatar=checker.requestAvatar(credentials)
+        request.avatar=self.avatar
         if request.avatar:
             return True
         return False
@@ -87,7 +86,13 @@ class TokenHandler(AvatarRequestHandler):
         if refresh_token:
             authorization=yield gen.Task(Authorization.select().where(Authorization.refresh_token_token==refresh_token).get)
 
-        validator = TardisRequestValidator(client, authorization)
+        credentials=AvatarEmailPasswordBoxId(self.get_argument('username', default=None),
+                                             self.get_argument('password', default=None),
+                                             client.id)
+        checker=AvatarCredentailsChecker()
+        avatar=checker.requestAvatar(credentials)
+
+        validator = TardisRequestValidator(client, authorization, avatar)
 
         if self.get_argument('grant_type', default=None)=='password':
             resourceOwnerPasswordCredentialsProvider=LegacyApplicationServer(validator)
