@@ -37,16 +37,13 @@ class RegistrationHandler(TenantRequestHandler):
     def get(self):
         self.render("register.html")
 
-    @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def post(self):
         salt = uuid.uuid4().hex
         # hash = hashlib.sha512(password + salt).hexdigest()
         self.render("login.html")
 
 class DashboardHandler(TenantRequestHandler):
-    @tornado.web.asynchronous
-    @tornado.gen.engine
     @tenant_authenticated
     def get(self):
         self.render("index.html", tenantname=self.current_tenant)

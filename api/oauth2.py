@@ -16,10 +16,13 @@ log = logging.getLogger(__name__)
 
 
 class TardisRequestValidator(RequestValidator):
+    def __init__(self, client, authorization):
+        super(self, TardisRequestValidator).__init__()
+        self.client=client
+        self.authorization=authorization
+
     def authenticate_client(self, request, *args, **kwargs):
-        checker = BoxCredentialsChecker()
-        request.client=checker.requestBox(request.extra_credentials)
-        log.debug(request.client)
+        request.client=self.client
         if request.client:
             return True
         return False
@@ -37,29 +40,25 @@ class TardisRequestValidator(RequestValidator):
         authorization=Authorization(access_token=token['access_token'], refresh_token=token['refresh_token'],
                                     expires_at=token['expires_at'], avatar=request.avatar,
                                     created_at=datetime.datetime.now(), updated_at=datetime.datetime.now())
-        authorization.save()
+        self.authorization.save()
 
-    @gen.coroutine
     def validate_bearer_token(self, token, scopes, request):
-        authorization=yield gen.Task(Authorization.select().where(Authorization.access_token==token).get)
-        if datetime.datetime.now() > authorization.expires_at:
-            raise gen.Return(False)
-        request.access_token = authorization
-        request.user = authorization.avatar
-        request.client = authorization.avatar.box
-        raise gen.Return(True)
+        if datetime.datetime.now() > self.authorization.expires_at:
+            return False
+        request.access_token = self.authorization.access_token
+        request.user = self.authorization.avatar
+        request.client = self.authorization.avatar.box
+        return True
 
     def validate_grant_type(self, client_id, grant_type, client, request, *args, **kwargs):
         return grant_type in ['password', 'client_credentials']
 
-    @gen.coroutine
     def validate_refresh_token(self, refresh_token, client, request, *args, **kwargs):
-        authorization=yield gen.Task(Authorization.select().where(Authorization.refresh_token_token==refresh_token).get)
-        if authorization and authorization.avatar.box.id==client.box_id:
-            request.client = authorization.avatar.box
-            request.avatar =authorization.avatar
-            raise gen.Return(True)
-        raise gen.Return(False)
+        if self.authorization and self.authorization.avatar.box.id==client.box_id:
+            request.client = self.authorization.avatar.box
+            request.avatar =self.authorization.avatar
+            return True
+        return False
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         return True
@@ -72,26 +71,36 @@ class TardisRequestValidator(RequestValidator):
             return True
         return False
 
-validator = TardisRequestValidator()
-resourceOwnerPasswordCredentialsProvider=LegacyApplicationServer(validator)
-clientCredentialsProvider=BackendApplicationServer(validator)
-
 
 class TokenHandler(AvatarRequestHandler):
     @gen.coroutine
     def post(self):
+        checker = BoxCredentialsChecker()
+        client=yield gen.Task(checker.requestBox, BoxClientIdClientSecret(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
+        authorization=None
+
+        access_token=self.get_argument('access_token', default=None)
+        if access_token:
+            authorization=yield gen.Task(Authorization.select().where(Authorization.access_token==access_token).get)
+
+        refresh_token=self.get_argument('refresh_token', default=None)
+        if refresh_token:
+            authorization=yield gen.Task(Authorization.select().where(Authorization.refresh_token_token==refresh_token).get)
+
+        validator = TardisRequestValidator(client, authorization)
+
         if self.get_argument('grant_type', default=None)=='password':
+            resourceOwnerPasswordCredentialsProvider=LegacyApplicationServer(validator)
             headers, body, status=resourceOwnerPasswordCredentialsProvider.create_token_response(self.request.uri,
                                                                                   http_method=self.request.method,
                                                                                   body=self.request.body,
-                                                                                  headers=self.request.headers,
-                                                                                  credentials=BoxClientIdClientSecret(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
+                                                                                  headers=self.request.headers)
         if self.get_argument('grant_type', default=None)=='client_credentials':
+            clientCredentialsProvider=BackendApplicationServer(validator)
             headers, body, status=clientCredentialsProvider.create_token_response(self.request.uri,
                                                                    http_method=self.request.method,
                                                                    body=self.request.body,
-                                                                   headers=self.request.headers,
-                                                                   credentials=BoxClientIdClientSecret(self.get_argument('client_id', default=None), self.get_argument('client_secret', default=None)))
+                                                                   headers=self.request.headers)
         self.set_status(status)
         self.write(body)
         for k, v in headers.items():
