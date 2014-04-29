@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 class TardisRequestValidator(RequestValidator):
     def __init__(self, client, authorization):
-        super(self, TardisRequestValidator).__init__()
+        super(TardisRequestValidator, self).__init__()
         self.client=client
         self.authorization=authorization
 
