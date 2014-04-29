@@ -17,7 +17,7 @@ class Box(AsyncModel):
     website_url= mopee.CharField()
     api_key= mopee.CharField()
     master_key= mopee.CharField()
-    tenant=mopee.ForeignKeyField(Tenant, related_name='boxes')
+    tenant=mopee.ForeignKeyField(Tenant, related_name='boxes', db_column='tenantname')
     created_at= mopee.DateTimeField
     updated_at= mopee.DateTimeField()
 
