@@ -6,7 +6,7 @@ from backends import db
 import momoko
 from oauthlib.oauth2 import RequestValidator, LegacyApplicationServer, BackendApplicationServer
 import logging
-import datetime
+from datetime import datetime, timedelta
 from tornado import web
 from tornado import gen
 from models import Box, Authorization
@@ -39,7 +39,7 @@ class TardisRequestValidator(RequestValidator):
 
     def save_bearer_token(self, token, request, *args, **kwargs):
         authorization=Authorization(access_token=token['access_token'], refresh_token=token['refresh_token'],
-                                    expires_at=token['expires_at'], avatar=request.avatar,
+                                    expires_at=datetime.now() + timedelta(seconds=100), avatar=request.avatar,
                                     created_at=datetime.datetime.now(), updated_at=datetime.datetime.now())
         self.authorization.save()
 
